@@ -14,7 +14,7 @@ const FilePage: React.FC = () => {
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<FileSchemaDTO[]>('/files/list');
+      const res = await axios.get<FileSchemaDTO[]>('/file/list');
       setFiles(res.data);
     } catch (error) {
       console.error('Failed to fetch file list:', error);
@@ -46,15 +46,15 @@ const FilePage: React.FC = () => {
           {files.map((file) => (
             <div key={file.fileName} className="border rounded p-3 shadow-sm bg-white">
               <h3 className="font-medium">{file.fileName}</h3>
-              <p className="text-sm text-gray-600">Columns: {file.columns.join(', ')}</p>
-              <a
-                href={`/api/v1/files/download/${file.fileName}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline text-sm mt-1 inline-block"
-              >
-                Download
-              </a>
+                  <p className="text-sm text-gray-600">Columns: {file.columns.join(', ')}</p>
+                  <a
+                      href={`http://localhost:8080/api/v1/files/download/${file.fileName}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline text-sm mt-1 inline-block"
+                  >
+                      Download
+                  </a>
             </div>
           ))}
         </div>

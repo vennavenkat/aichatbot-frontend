@@ -15,7 +15,7 @@ const LogsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/v1/logs')
+    axios.get('/logs')
       .then(res => setLogs(res.data))
       .catch(() => alert('Failed to fetch logs'))
       .finally(() => setLoading(false));

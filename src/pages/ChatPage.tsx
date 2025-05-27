@@ -29,29 +29,43 @@ const ChatPage: React.FC = () => {
         }
     }, [response]);
 
-    const generateChart = async () => {
-        if (!response || !response.resultData || !selectedColumn) return;
+   const generateChart = async () => {
+  if (!response || !response.resultData || !selectedColumn) return;
 
-        const labels = response.resultData.map((_, i) => `Row ${i + 1}`);
-        const values = response.resultData.map(row => Number(row[selectedColumn]) || 0);
+  // Try to pick a name-like column to use for labels
+  const labelKey = columns.find(col => /name|title/i.test(col)) || columns[0];
+  const labels = response.resultData.map(row => row[labelKey] || 'N/A');
+  const values = response.resultData.map(row => Number(row[selectedColumn]) || 0);
 
-        try {
-            setIsLoading(true); // start spinner
+  try {
+    setIsLoading(true); // start spinner
 
-            const res = await axios.post('/api/v1/chart', {
-                chartType,
-                labels,
-                values
-            });
+    const res = await axios.post('/chart', {
+      chartType,
+      labels,
+      values
+    });
 
-            setBase64Chart(res.data.imageBase64 || res.data);
-        } catch (err) {
-            console.error('Chart generation failed:', err);
-            alert('Failed to generate chart. Check your input data.');
-        } finally {
-            setIsLoading(false); // stop spinner
-        }
-    };
+    let imageBase64 = '';
+    if (typeof res.data === 'string') {
+      imageBase64 = res.data;
+    } else if (res.data.base64Image && typeof res.data.base64Image === 'string') {
+      imageBase64 = res.data.base64Image;
+    } else {
+      throw new Error('Invalid chart response format');
+    }
+
+    setBase64Chart(imageBase64);
+    console.log('Chart generated successfully');
+  } catch (err) {
+    console.error('Chart generation failed:', err);
+    alert('Failed to generate chart. Check your input data.');
+  } finally {
+    setIsLoading(false); // stop spinner
+  }
+};
+
+
 
     return (
         <div className="p-4 space-y-6">
@@ -139,9 +153,9 @@ const ChatPage: React.FC = () => {
                                         <span className="text-blue-600 font-medium">Generating chart...</span>
                                     </div>
                                 )}
-                                <Button onClick={generateChart} disabled={isLoading}>
+                                {/* <Button onClick={generateChart} disabled={isLoading}>
                                     {isLoading ? 'Generating...' : 'Generate Chart'}
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     )}
